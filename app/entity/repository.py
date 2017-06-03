@@ -21,11 +21,12 @@ class StoryRepositoryMongo(Repository):
 
         :param Database db_client:
         """
-        self.db = db  # Database
-        self.collection = db.stories
+        self.db = db
+        self.collection = self.db.stories
 
     def find_all(self):
         results = self.collection.find({})
+        print(results.count())
         return [Story(**result) for result in results]
 
     def find_one(self, entity_id):

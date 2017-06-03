@@ -4,9 +4,17 @@ __author__ = 'Flavio Ferrara'
 
 from behave import given, when, then
 
+def init_db():
+    return None
+
 @given(u'the news list is empty')
 def step_impl(context):
-    pass
+    config = dict(
+        DATABASE='empty_database',
+        TESTING=True
+    )
+    app = create_app(config)
+    context.client = app.test_client()
 
 @when(u'user visit the homepage')
 def step_impl(context):
@@ -18,11 +26,17 @@ def step_impl(context):
 
 @given(u'the news list contain at least 10 news')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Given the news list contain at least 10 news')
+    config = dict(
+        DATABASE='test_db',
+        TESTING=True
+    )
+    app = create_app(config)
+    context.client = app.test_client()
 
 @then(u'10 news are displayed')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then 10 news are displayed')
+    assert b'No entries here so far' not in context.rv.data
+    assert context.rv.data.count(b'<li class="story') == 10
 
 @when(u'user visit the homepage in italian')
 def step_impl(context):

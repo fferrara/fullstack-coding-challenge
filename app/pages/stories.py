@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, g, current_app
+from app.db import init_db
+from app.service.story import StoryService
 
 __author__ = 'Flavio Ferrara'
 
@@ -6,4 +8,7 @@ stories_bp = Blueprint('stories', __name__, url_prefix='/stories')
 
 @stories_bp.route('/')
 def index():
-    return render_template('stories/index.html')
+    g.db, g.db_client = init_db(current_app)
+    service = StoryService(g.db)
+    stories = service.get_stories()
+    return render_template('stories/index.html', stories=stories)

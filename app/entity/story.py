@@ -12,8 +12,8 @@ class Story(HackernewsItem):
         self.translations = []
 
     @property
-    def title(self, language):
-        pass
+    def title(self, language='pt'):
+        return self.original_title
 
     def add_translation(self, translation):
         pass
