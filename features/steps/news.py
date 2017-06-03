@@ -1,18 +1,20 @@
+from app.factory import create_app
+
 __author__ = 'Flavio Ferrara'
 
 from behave import given, when, then
 
 @given(u'the news list is empty')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Given the news list is empty')
+    pass
 
 @when(u'user visit the homepage')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: When user visit the homepage')
+    context.rv = context.client.get('/', follow_redirects=True)
 
 @then(u'no post is displayed')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then no post is displayed')
+    assert b'No entries here so far' in context.rv.data
 
 @given(u'the news list contain at least 10 news')
 def step_impl(context):
