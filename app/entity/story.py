@@ -3,10 +3,10 @@ from app.entity.hackernews import HackernewsItem
 __author__ = 'Flavio Ferrara'
 
 class Story(HackernewsItem):
-    def __init__(self, id, deleted, by, time, text, dead, kids, url, score, title, descendants):
-        super().__init__(id, deleted, by, time, text, dead, kids)
+    def __init__(self, id, by, time, text, kids, url, score, title, descendants, **kwargs):
+        super().__init__(id, by, time, text, kids)
         self.descendants = descendants
-        self.title = title
+        self.original_title = title
         self.score = score
         self.url = url
         self.translations = []
