@@ -38,7 +38,7 @@ class StoryRepositoryTest(unittest.TestCase):
     def test_new_story(self):
         story = Story(**self.story_data)
 
-        self.repository.add(story)
+        self.repository.save(story)
 
         # testing
         added_story = self.collection.find_one({"_id": 8863})

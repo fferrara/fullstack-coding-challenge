@@ -10,7 +10,7 @@ def connect_db():
     return db_client
 
 
-def init_db(app):
+def get_db(app):
     """Initializes the database."""
     db_client = connect_db()
     db = db_client[app.config['DATABASE']]
