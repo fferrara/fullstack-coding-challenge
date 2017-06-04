@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block content %}
+    {% if translations | length  == 0 %}
+        <p>No entries here so far :/</p>
+    {% endif %}
+    <ol class="list-group">
+        {% for job in translations %}
+            <li class="translation list-group-item">
+                <h4>{{ job.text }}</h4>
+
+                <p class="text-muted">
+                    {{ job.status }}
+                </p>
+            </li>
+        {% endfor %}
+    </ol>
+
+{% endblock %}

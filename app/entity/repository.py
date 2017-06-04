@@ -41,12 +41,15 @@ class StoryRepositoryMongo(Repository):
 
     def find_one(self, entity_id):
         result = self.collection.find_one({'_id': entity_id})
-        return Story(**result)
+
+        if result is not None:
+            return Story.from_document(**result)
+        return None
 
     def save(self, story):
         story_dict = story.to_document()
         story_dict['_id'] = story.id
-        story = self.collection.update({'_uid': story.id}, story_dict, upsert=True)
+        self.collection.update({'_uid': story.id}, story_dict, upsert=True)
         return story
 
     def update(self, entity):
@@ -65,7 +68,6 @@ class TranslationRepositoryMongo(Repository):
 
     def save(self, translation):
         print('Save translation')
-        print(translation)
         translation_dict = translation.__dict__
         translation_dict['_id'] = translation.uid
         translation = self.collection.insert_one(translation_dict)

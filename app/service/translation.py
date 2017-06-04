@@ -3,6 +3,7 @@ import json
 import threading
 import time
 from requests_futures.sessions import FuturesSession
+from app.entity.repository import TranslationRepositoryMongo
 from app.entity.translation import TitleTranslation
 
 __author__ = 'Flavio Ferrara'
@@ -31,16 +32,20 @@ class UnbabelTranslator:
         """
         print('Translating')
         subject = Subject()
-        self.__pending[(story.id, language)] = subject
 
         def callback(session, response):
             data = response.json()
-            subject.on_next(data)
+            translation = TitleTranslation(**data)
+            self.__pending[translation.uid] = subject
+            subject.on_next(translation)
 
-        #self.unbabel.translate(story.title, language, callback)
-        self.unbabel.get_translation('', callback)
+        self.unbabel.translate(story.title, language, callback)
 
         return subject.as_observable()
+
+    def check_translations(self):
+        for uid in self.__pending.keys():
+            print(uid)
 
 
 class UnbabelService:
@@ -66,9 +71,9 @@ class UnbabelService:
         }
 
         return self.session.post('{}{}'.format(self.endpoint, '/mt_translation/'),
-                                headers=self.headers,
-                                data=json.dumps(payload),
-                                background_callback=callback
+                                 headers=self.headers,
+                                 data=json.dumps(payload),
+                                 background_callback=callback
 
         )
 
@@ -81,7 +86,3 @@ class UnbabelService:
         return self.session.get('{}{}'.format(self.endpoint, '/mt_translation/'),
                                 headers=self.headers,
                                 background_callback=callback)
-
-
-
-

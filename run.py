@@ -20,22 +20,28 @@ def translate(story, repository):
 
 if __name__ == '__main__':
     app = create_app()
-
     db, _ = get_db(app)
 
     story_rep = StoryRepositoryMongo(db)
+    translation_rep = TranslationRepositoryMongo(db)
 
-    story_fetcher.story_stream.subscribe(story_rep.save)
+    new_stories = story_fetcher.story_stream\
+        .filter(lambda story: story_rep.find_one(story.id) is None)
 
-    #story_fetcher.story_stream.subscribe(lambda story: translate(story, translation_rep))
+    new_stories.subscribe(lambda story: print('new {}'.format(story.id)))
+
+    #new_stories.subscribe(story_rep.save)
+    #new_stories.subscribe(lambda story: translate(story, translation_rep))
     #translator.translation_stream.subscribe(store_story)
 
-    #scheduler = schedule.NonBlockingScheduler()
+    scheduler = schedule.NonBlockingScheduler()
     #scheduler.every(5).seconds.do(story_fetcher.fetch_stories)
     #scheduler.run_continuously()
 
+    scheduler.every().minute.do(translator.check_translations)
 
-    story_fetcher.fetch_stories()
+
+    #story_fetcher.fetch_stories()
 
 
     app.run(use_reloader=False)

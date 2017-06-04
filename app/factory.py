@@ -1,5 +1,5 @@
 from flask.helpers import url_for
-from app.pages import stories
+from app.pages import stories, dashboard
 from flask import Flask, redirect, g
 
 __author__ = 'Flavio Ferrara'
@@ -26,7 +26,7 @@ def create_app(config=None):
 def register_blueprints(app):
     """Register all blueprint modules
     """
-    # app.register_blueprint(dashboard)
+    app.register_blueprint(dashboard.dashboard_bp)
     app.register_blueprint(stories.stories_bp)
 
     @app.route('/')
