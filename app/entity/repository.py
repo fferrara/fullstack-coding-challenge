@@ -46,8 +46,8 @@ class StoryRepositoryMongo(Repository):
     def save(self, story):
         story_dict = story.to_document()
         story_dict['_id'] = story.id
-        story = self.collection.insert_one(story_dict)
-        return story.inserted_id
+        story = self.collection.update({'_uid': story.id}, story_dict, upsert=True)
+        return story
 
     def update(self, entity):
         pass

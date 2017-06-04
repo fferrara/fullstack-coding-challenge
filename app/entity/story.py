@@ -20,9 +20,6 @@ class Story(HackernewsItem):
     def add_translation(self, translation):
         pass
 
-    def has_comments(self):
-        return self.descendants > 0
-
     def to_document(self):
         doc = self.__dict__
         doc['comments'] = [c.to_document() for c in self.comments]
@@ -33,7 +30,9 @@ class Story(HackernewsItem):
     @classmethod
     def from_document(cls, id, by, time, url, score, original_title, descendants, text='', kids=None, comments=None, **kwargs):
         s = Story(id, by, time, url, score, original_title, descendants, text, kids)
-        for comment in comments:
-            s.comments.append(Comment.from_document(**comment))
+
+        if comments is not None:
+            for comment in comments:
+                s.comments.append(Comment.from_document(**comment))
 
         return s

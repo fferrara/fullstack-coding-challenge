@@ -23,9 +23,9 @@ if __name__ == '__main__':
 
     db, _ = get_db(app)
 
-    translation_rep = TranslationRepositoryMongo(db)
-
     story_rep = StoryRepositoryMongo(db)
+
+    story_fetcher.story_stream.subscribe(story_rep.save)
 
     #story_fetcher.story_stream.subscribe(lambda story: translate(story, translation_rep))
     #translator.translation_stream.subscribe(store_story)
@@ -35,6 +35,7 @@ if __name__ == '__main__':
     #scheduler.run_continuously()
 
 
-    #story_fetcher.fetch_stories()
+    story_fetcher.fetch_stories()
 
-    app.run()
+
+    app.run(use_reloader=False)

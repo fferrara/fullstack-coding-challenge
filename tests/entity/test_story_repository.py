@@ -77,5 +77,7 @@ class StoryRepositoryTest(unittest.TestCase):
         print(updated_story)
 
     def __insert_example_story(self):
-        self.story_data['_id'] = 8863
-        self.collection.insert_one(self.story_data)
+        story = Story(**self.story_data)
+        doc = story.to_document()
+        doc['_id'] = 8863
+        self.collection.insert_one(doc)

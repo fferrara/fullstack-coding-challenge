@@ -9,3 +9,6 @@ class HackernewsItem(ABC):
         self.time = time
         self.by = by
         self.id = id
+
+    def has_comments(self):
+        return len(self.kids) > 0

@@ -11,5 +11,4 @@ def index():
     g.db, g.db_client = get_db(current_app)
     service = StoryService(g.db)
     stories = service.get_stories()
-    print(stories[0].title)
     return render_template('stories/index.html', stories=stories)
