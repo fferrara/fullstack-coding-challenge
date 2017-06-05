@@ -1,3 +1,38 @@
+This is my solution for the Unbabel Fullstack Challenge.
+
+# Installation
+
+Tested with Python 3.6
+
+Just clone the repository. 
+
+The recommended way is to create a virtual environment. On Linux/Mac
+
+    virtualenv fferrara-challenge
+    cd fferrara-challenge
+    source bin/activate
+    pip install -r requirements.txt
+
+To run the application:
+
+    python -u run.py
+
+# Design choices
+
+The application is self-contained, so it doesn't need any system setup. It uses a Python scheduler to schedule repeating tasks. In a production environment, it would be probably better to use a system scheduler like `cron`.
+
+For the same reason, pending Unbabel translations are checked using a polling approach: a GET call each minute until the translated text is available. In production, it is recommended to provide a POST endpoint, reachable from the Internet, and use the `callback_url` parameter to pass the URL to Unbabel.
+
+-------
+
+All network API calls are non-blocking, to improve scalability. Moreover, the Unbabel translation process is asynchronous. To handle all the asynchronicity I adopted a reactive programming approach using [RxPy](https://github.com/ReactiveX/RxPY). It allows different async operations to have low coupling.
+
+## Possible improvements
+
+- Using an ODM library.
+- Improve tests coverage. Testing asynchronous code can be quite difficult.
+
+
 # Unbabel Fullstack Challenge
 
 Hey :smile:
