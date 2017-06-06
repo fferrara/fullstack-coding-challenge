@@ -6,7 +6,7 @@
     <ol class="list-group">
         {% for story in stories %}
             <li class="story list-group-item">
-                <h4><a href="{{ story.url }}">{{ story.title }}</a></h4>
+                <h4><a href="{{ story.url }}">{{ story.get_title('pt') }}</a></h4>
 
                 <p>
                     {{ story.score }} points by <span class="text-muted">{{ story.by }}</span>.

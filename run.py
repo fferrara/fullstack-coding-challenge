@@ -9,10 +9,7 @@ from app.factory import create_app
 from app.service.story_source import StoryFetcher
 from app.service.translation import UnbabelTranslator
 
-story_fetcher = StoryFetcher()
-translator = UnbabelTranslator()
-
-def translate(story, story_rep):
+def translate(story):
     print('pushada story {}'.format(story.id))
 
     def add_translation(translation):
@@ -22,32 +19,35 @@ def translate(story, story_rep):
     translator.translate(story, 'pt').subscribe(add_translation)
     #translator.translate(story, 'it').subscribe(store_translation)
 
-def check_translations(translation_rep):
-    def save_translation(translation):
-        translation_rep.update(translation)
 
+def check_translations():
     pending = translation_rep.find_pending()
-    translator.check_translations(pending).subscribe(save_translation)
+
+    if not pending:
+        return
+    translator.check_translations(pending).subscribe(translation_rep.save)
 
 if __name__ == '__main__':
+    story_fetcher = StoryFetcher()
+    translator = UnbabelTranslator()
     app = create_app()
     db, _ = get_db(app)
 
     story_rep = StoryRepositoryMongo(db)
     translation_rep = TranslationRepositoryMongo(db)
 
-    new_stories = story_fetcher.story_stream.filter(lambda story: story_rep.find_one(story.id) is None)
-
     # translating new stories
-    new_stories.subscribe(lambda story: translate(story, story_rep))
-    # updating old stories
+    story_fetcher.story_stream\
+        .filter(lambda story: story_rep.find_one(story.id) is None)\
+        .subscribe(translate)
+    # updating all stories
     story_fetcher.story_stream.subscribe(story_rep.save)
 
     scheduler = schedule.NonBlockingScheduler()
-    #scheduler.every(5).minutes.do(story_fetcher.fetch_stories)
-    #scheduler.every().minute.do(lambda: check_translations(story_rep, translation_rep))
+    scheduler.every(10).minutes.do(story_fetcher.fetch_stories)
+    scheduler.every().minute.do(check_translations)
 
-    #scheduler.run_continuously()
+    scheduler.run_continuously()
 
     story_fetcher.fetch_stories()
 

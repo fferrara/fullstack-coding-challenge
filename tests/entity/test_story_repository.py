@@ -68,7 +68,7 @@ class StoryRepositoryTest(unittest.TestCase):
 
 
         # method call
-        story = self.repository.find_one(8863)
+        story = Story(**self.story_data)
         story.add_translation(translation)
         self.repository.save(story)
 

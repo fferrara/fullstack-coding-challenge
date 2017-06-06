@@ -30,9 +30,9 @@ class TranslationRepositoryTest(unittest.TestCase):
             "url": "http://www.getdropbox.com/u/2/screencast.html",
         })
 
-        self.t1 = TitleTranslation("5d10df62d3", "My YC app: Dropbox - Throw away your USB drive", "new", "pt")
+        self.t1 = TitleTranslation("5d10df62d3", "My YC app: Dropbox - Throw away your USB drive", "machine_translation_in_progress", "pt")
 
-        self.t2 = TitleTranslation("5d10df62d4", "My YC app: Dropbox - Throw away your USB drive", "completed", "it",
+        self.t2 = TitleTranslation("5d10df62d4", "My YC app: Dropbox - Throw away your USB drive", "deliver_ok", "it",
                                    translated_text='Butta via il tuo USB drive')
 
         self.__insert_example_story()
@@ -55,7 +55,7 @@ class TranslationRepositoryTest(unittest.TestCase):
         assert updated_story is not None
         assert len(updated_story['translations']) > 0
         translation = updated_story['translations'][0]
-        assert translation['status'] == 'completed'
+        assert translation['status'] == 'deliver_ok'
         assert translation['translated_text'] == 'Jogue fora seu USB drive'
 
     def test_find_pending(self):

@@ -40,7 +40,7 @@ class UnbabelTranslator:
         """
         print('Translating')
 
-        return self.unbabel.translate(story.title, language).map(build_translation)
+        return self.unbabel.translate(story.original_title, language).map(build_translation)
 
     def check_translations(self, pending):
         """
@@ -57,12 +57,13 @@ class UnbabelTranslator:
                 .filter(lambda translation: translation.is_completed)
             all_completed.append(completed)
 
+        print(all_completed)
         return Observable.merge(all_completed)
 
 
 class UnbabelService:
     def __init__(self):
-        self.endpoint = 'https://sandbox.unbabel.com/tapi/v2'
+        self.endpoint = 'https://sandbox.unbabel.com/tapi/v2/mt_translation'
         self.headers = {
             'Authorization': 'ApiKey {}:{}'.format('femferrara', 'e5978389579797963998666d6a61aed758417543'),
             'Content-Type': 'application/json'
@@ -83,7 +84,7 @@ class UnbabelService:
             "target_language": language
         }
 
-        future = self.session.post('{}{}'.format(self.endpoint, '/mt_translation/'),
+        future = self.session.post('{}/'.format(self.endpoint),
                                    headers=self.headers,
                                    data=json.dumps(payload))
         return Observable.from_future(future)
@@ -94,6 +95,6 @@ class UnbabelService:
         :param str uid:
         :return:
         """
-        future = self.session.get('{}{}{}'.format(self.endpoint, '/mt_translation/', uid),
+        future = self.session.get('{}/{}/'.format(self.endpoint, uid),
                                   headers=self.headers)
         return Observable.from_future(future)

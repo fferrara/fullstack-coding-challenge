@@ -1,5 +1,6 @@
 from app.entity.comment import Comment
 from app.entity.hackernews import HackernewsItem
+from app.entity.translation import TitleTranslation
 
 __author__ = 'Flavio Ferrara'
 
@@ -13,27 +14,44 @@ class Story(HackernewsItem):
         self.translations = []
         self.comments = []
 
-    @property
-    def title(self, language='pt'):
-        return self.original_title
+    def get_title(self, language):
+        if not self.translations:
+            return self.original_title
+
+        try:
+            translation = next(t for t in self.translations if t.target_language == language and t.is_completed())
+            print(translation)
+            return translation.translatedText
+        except StopIteration:
+            raise ValueError('No completed translation for language {}'.format(language))
 
     def add_translation(self, translation):
         self.translations.append(translation)
 
     def to_document(self):
         doc = self.__dict__.copy()
-        doc['comments'] = [c.to_document() for c in self.comments]
-        doc['translations'] = [t.to_document() for t in self.translations]
+        doc['comments'] = self.comments and [c.to_document() for c in self.comments]
+        doc['translations'] = self.translations and [t.to_document() for t in self.translations] or None
         doc['_id'] = self.id
+
+        if not self.comments:
+            del doc['comments']
+        if not self.translations:
+            del doc['translations']
 
         return doc
 
     @classmethod
-    def from_document(cls, id, by, time, url, score, original_title, descendants, text='', kids=None, comments=None, **kwargs):
+    def from_document(cls, id, by, time, url, score, original_title, descendants, text='', kids=None,
+                      comments=None, translations=None, **kwargs):
         s = Story(id, by, time, url, score, original_title, descendants, text, kids)
 
         if comments is not None:
             for comment in comments:
                 s.comments.append(Comment.from_document(**comment))
+
+        if translations is not None:
+            for translation in translations:
+                s.translations.append(TitleTranslation(**translation))
 
         return s

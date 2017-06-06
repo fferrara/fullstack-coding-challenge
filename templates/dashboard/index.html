@@ -9,7 +9,7 @@
                 <h4>{{ job.text }}</h4>
 
                 <p class="text-muted translation-{{ job.status }}">
-                    {{ job.is_completed() and 'completed' or 'translating' }}
+                    {{ job.is_completed() and 'translated' or 'translating' }} to {{job.target_language}}
                 </p>
             </li>
         {% endfor %}

@@ -44,7 +44,12 @@ class StoryRepositoryMongo(Repository):
 
     def save(self, story):
         story_dict = story.to_document()
-        self.collection.update({'_id': story.id}, story_dict, upsert=True)
+        self.collection.update({'_id': story.id}, {'$set': story_dict}, upsert=True)
+        return story
+
+    def update(self, story):
+        story_dict = story.to_document()
+        self.collection.update({'_id': story.id}, {'$set': story_dict})
         return story
 
 
@@ -79,7 +84,7 @@ class TranslationRepositoryMongo(Repository):
                                      if translation.uid == t['uid'] else t
                                      for t in story_doc['translations']]
 
-        self.collection.update({'_id': story_doc['_id']}, story_doc)
+        self.collection.update({'_id': story_doc['_id']}, {'$set': story_doc})
 
     def _find_by_translation(self, translation_uid):
         return self.collection.find_one({

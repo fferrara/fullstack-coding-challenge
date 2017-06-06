@@ -23,7 +23,7 @@ class StoryTest(unittest.TestCase):
         assert isinstance(story, Story)
         assert story.id == 8866
         assert story.has_comments() == False
-        assert story.title == "What Entrepreneurs Most Want to Know: March 2007's Most Popular Work.com How-to Guides"
+        assert story.original_title == "What Entrepreneurs Most Want to Know: March 2007's Most Popular Work.com How-to Guides"
 
     def testCreatingWithComments(self):
         data = {
@@ -44,7 +44,7 @@ class StoryTest(unittest.TestCase):
         assert isinstance(story, Story)
         assert story.id == 8863
         assert story.has_comments() == True
-        assert story.title == "My YC app: Dropbox - Throw away your USB drive"
+        assert story.original_title == "My YC app: Dropbox - Throw away your USB drive"
 
     def testCreatingFromDocument(self):
         document = {"_id": 14481296, "kids": [14482164, 14481838, 14482011, 14481688, 14481711, 14481806], "text": "",
@@ -63,10 +63,28 @@ class StoryTest(unittest.TestCase):
         assert story is not None
         assert isinstance(story, Story)
         assert story.id == 14481296
-        assert story.title == "The Wonderful WiFi232: BBSing Has Never Been Easier"
+        assert story.original_title == "The Wonderful WiFi232: BBSing Has Never Been Easier"
         assert story.has_comments() == True
         assert len(story.comments) == 2
 
         comment = story.comments[0]
         assert isinstance(comment, Comment)
         assert comment.text == "For me, calling a BBS will always be a modem and modem tones."
+
+    def test_to_document(self):
+        data = {
+            "by": "shara",
+            "descendants": 0,
+            "id": 8866,
+            "score": 2,
+            "time": 1175714617,
+            "title": "What Entrepreneurs Most Want to Know: March 2007's Most Popular Work.com How-to Guides",
+            "type": "story",
+            "url": "http://blogs.work.com/community/2007/04/what_entreprene.html"
+        }
+        story = Story(**data)
+        doc = story.to_document()
+
+        assert doc['id'] == 8866
+        assert doc.get('comments') is None
+        assert doc.get('translations') is None
