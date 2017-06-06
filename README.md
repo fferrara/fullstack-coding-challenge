@@ -12,9 +12,8 @@ This is my solution for the Unbabel Fullstack Challenge. Enjoy :wink:
 
 4. The recommended way is to create a virtual environment. On Linux/Mac
 
-        virtualenv fferrara-challenge
-        cd fferrara-challenge
-        source bin/activate
+        virtualenv venv
+        source venv/bin/activate
         pip install -r requirements.txt
 
 5. To run the application:
