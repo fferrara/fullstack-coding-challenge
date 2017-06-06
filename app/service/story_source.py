@@ -1,4 +1,6 @@
+from requests import session
 from requests_futures.sessions import FuturesSession
+from rx import Observable
 
 from app.entity.comment import Comment
 from app.entity.story import Story
@@ -9,11 +11,15 @@ __author__ = 'Flavio Ferrara'
 from rx.subjects import Subject
 
 
+def not_deleted_story(story_json):
+    return story_json.get('deleted', False) is False
+
+
 class StoryFetcher:
     def __init__(self):
         self.__subject = Subject()
         self.hn = HackernewsService()
-        self.limit = 10
+        self.limit = 3
 
     @property
     def story_stream(self):
@@ -24,30 +30,31 @@ class StoryFetcher:
         if limit is not None:
             self.limit = limit
 
-        self.hn.get_all_stories(self.__handle_hn_stories)
+        self.hn.get_all_stories_obs() \
+            .map(lambda response: response.json()) \
+            .subscribe(self.__handle_hn_stories)
 
-    def __handle_hn_stories(self, session, response):
-        data = response.json()
-        for story_id in data[:self.limit]:
-            self.hn.get_item(story_id, self.__handle_hn_story)
+    def __handle_hn_stories(self, stories_json):
+        for story_id in stories_json[:self.limit]:
+            self.hn.get_item_obs(story_id) \
+                .map(lambda response: response.json()) \
+                .filter(not_deleted_story) \
+                .subscribe(self.__handle_hn_story)
 
-    def __handle_hn_story(self, session, response):
-        data = response.json()
-        if data.get('deleted', False):
-            return
-
-        story = Story(**data)
+    def __handle_hn_story(self, story_json):
+        story = Story(**story_json)
         if story.has_comments():
             story.comments = self.__get_comments(story)
 
         # push the story to observers
         self.__subject.on_next(story)
 
+    # This function is the only blocking one, due to the recursive structure of comments
     def __get_comments(self, item):
         futures = [self.hn.get_item(comment_id) for comment_id in item.kids]
         comments = []
         for future in futures:
-            comment_data = future.result().json()
+            comment_data = future.result().json()  # this call waits for the future to finish
             if comment_data.get('deleted', False):
                 continue
             c = Comment(**comment_data)
@@ -62,13 +69,19 @@ class StoryFetcher:
 class HackernewsService:
     def __init__(self):
         self.endpoint = 'https://hacker-news.firebaseio.com/v0/'
+        self.session = session()
 
-    def get_all_stories(self, callback=None):
-        session = FuturesSession(max_workers=10)
-        return session.get('{}{}'.format(self.endpoint, 'topstories.json'), background_callback=callback)
+    def get_all_stories_obs(self):
+        session = FuturesSession(session=self.session)
+        future = session.get('{}{}'.format(self.endpoint, 'topstories.json'))
+        return Observable.from_future(future)
 
-    def get_item(self, story_id, callback=None):
-        session = FuturesSession(max_workers=10)
-        return session.get('{}{}{}{}'.format(self.endpoint, 'item/', str(story_id), '.json'), background_callback=callback)
+    def get_item_obs(self, item_id):
+        future = self.get_item(item_id)
+        return Observable.from_future(future)
+
+    def get_item(self, item_id):
+        session = FuturesSession(session=self.session)
+        return session.get('{}{}{}{}'.format(self.endpoint, 'item/', str(item_id), '.json'))
 
 

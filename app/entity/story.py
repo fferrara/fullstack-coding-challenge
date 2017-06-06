@@ -21,7 +21,7 @@ class Story(HackernewsItem):
         pass
 
     def to_document(self):
-        doc = self.__dict__
+        doc = self.__dict__.copy()
         doc['comments'] = [c.to_document() for c in self.comments]
         doc['translations'] = [t.to_document() for t in self.translations]
 

@@ -3,6 +3,7 @@ import json
 import threading
 import time
 from requests_futures.sessions import FuturesSession
+from rx import Observable
 from app.entity.repository import TranslationRepositoryMongo
 from app.entity.translation import TitleTranslation
 
@@ -11,17 +12,24 @@ __author__ = 'Flavio Ferrara'
 from rx.subjects import Subject
 
 
+def build_translation(response, error):
+    if response.status_code > 299:
+        raise ValueError('Translation request failed: {}'.format(response.content))
+    print(response)
+    data = response.json()
+    return TitleTranslation(**data)
+
+
 class UnbabelTranslator:
     """
     Offers an asynchronous interface to Unbabel RESTful API, based on RX Observables.
     Due to the async nature of Unbabel translation process, results are not available in real-time.
     The translator is responsible to poll the HTTP endpoint or provide a webhook.
 
-    When a translation is completed, it will be emitted on its stream (Observable).
+    When a translation is completed, it will be emitted on a stream (Observable).
     """
 
     def __init__(self):
-        self.__pending = {}
         self.unbabel = UnbabelService()
 
     def translate(self, story, language):
@@ -31,58 +39,61 @@ class UnbabelTranslator:
         :param language:
         """
         print('Translating')
-        subject = Subject()
 
-        def callback(session, response):
-            data = response.json()
-            translation = TitleTranslation(**data)
-            self.__pending[translation.uid] = subject
-            subject.on_next(translation)
+        return self.unbabel.translate(story.title, language).map(build_translation)
 
-        self.unbabel.translate(story.title, language, callback)
+    def check_translations(self, pending):
+        """
+        Check the state of all pending translations.
 
-        return subject.as_observable()
+        Completed translations will be emitted on the Observable returned.
+        :param pending: a list of pending TitleTranslations.
+        :return: an Observable where completed TitleTranslations will be emitted
+        """
+        all_completed = []
+        for pending_translation in pending:
+            completed = self.unbabel.get_translation(pending_translation.uid) \
+                .map(build_translation) \
+                .filter(lambda translation: translation.is_completed)
+            all_completed.append(completed)
 
-    def check_translations(self):
-        for uid in self.__pending.keys():
-            print(uid)
+        return Observable.merge(all_completed)
 
 
 class UnbabelService:
     def __init__(self):
-        self.endpoint = 'https://www.unbabel.com/tapi/v2'
+        self.endpoint = 'https://sandbox.unbabel.com/tapi/v2'
         self.headers = {
-            'Authorization': 'ApiKey {}:{}'.format('gracaninja', '5a6406e31f77ef779c4024b1579f0f6103944c5e'),
+            'Authorization': 'ApiKey {}:{}'.format('femferrara', 'e5978389579797963998666d6a61aed758417543'),
             'Content-Type': 'application/json'
         }
         self.session = FuturesSession()
 
-    def translate(self, text, language, callback):
+    def translate(self, text, language):
         """
         Post a new MT Translation to Unbabel RESTful API
         :param str text:
         :param str language:
         :return:
         """
+        print(text)
         payload = {
             "text": text,
             "source_language": "en",
             "target_language": language
         }
 
-        return self.session.post('{}{}'.format(self.endpoint, '/mt_translation/'),
-                                 headers=self.headers,
-                                 data=json.dumps(payload),
-                                 background_callback=callback
+        future = self.session.post('{}{}'.format(self.endpoint, '/mt_translation/'),
+                                   headers=self.headers,
+                                   data=json.dumps(payload))
+        return Observable.from_future(future)
 
-        )
-
-    def get_translation(self, uid, callback):
+    def get_translation(self, uid):
         """
         Retrieve an MT Translation from Unbabel RESTful API
         :param str uid:
         :return:
         """
-        return self.session.get('{}{}'.format(self.endpoint, '/mt_translation/'),
-                                headers=self.headers,
-                                background_callback=callback)
+        future = self.session.get('{}{}{}'.format(self.endpoint, '/mt_translation/', uid),
+                                  headers=self.headers)
+        return Observable.from_future(future)

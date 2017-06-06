@@ -3,3 +3,11 @@ ol { list-style: decimal inside; }
 .comment-body {
     padding-left: 10px;
 }
+
+.translation-new {
+    color: #f4a744;
+}
+
+.translation-complete {
+    color: green;
+}

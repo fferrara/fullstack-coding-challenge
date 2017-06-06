@@ -49,11 +49,8 @@ class StoryRepositoryMongo(Repository):
     def save(self, story):
         story_dict = story.to_document()
         story_dict['_id'] = story.id
-        self.collection.update({'_uid': story.id}, story_dict, upsert=True)
+        self.collection.update({'_id': story.id}, story_dict, upsert=True)
         return story
-
-    def update(self, entity):
-        pass
 
 
 class TranslationRepositoryMongo(Repository):
@@ -63,6 +60,11 @@ class TranslationRepositoryMongo(Repository):
 
     def find_all(self):
         results = self.collection.find({})
+        print(results.count())
+        return [TitleTranslation(**result) for result in results]
+
+    def find_pending(self):
+        results = self.collection.find({"status": "new"})
         print(results.count())
         return [TitleTranslation(**result) for result in results]
 

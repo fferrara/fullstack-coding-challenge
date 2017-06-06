@@ -16,3 +16,6 @@ class TitleTranslation:
         self.target_language = target_language
         self.status = status
         self.text_format = text_format
+
+    def is_completed(self):
+        return self.status == "completed"
