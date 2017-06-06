@@ -31,7 +31,7 @@ def step_impl(context):
     )
     app = create_app(config)
     context.client = app.test_client()
-    db, _ = get_db(app)
+    db, _ = get_db()
     fill_db(db)
 
 @then(u'the news are displayed')

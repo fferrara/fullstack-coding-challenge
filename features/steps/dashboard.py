@@ -32,7 +32,7 @@ def step_impl(context):
     )
     app = create_app(config)
     context.client = app.test_client()
-    context.db, _ = get_db(app)
+    context.db, _ = get_db()
     fill_db(context.db)
 
     story = context.db.stories.find_one({'_id': 14499255})

@@ -35,7 +35,7 @@ if __name__ == '__main__':
     story_fetcher = StoryFetcher()
     translator = UnbabelTranslator()
     app = create_app()
-    db, _ = get_db(app)
+    db, _ = get_db()
 
     story_rep = StoryRepositoryMongo(db)
     translation_rep = TranslationRepositoryMongo(db)

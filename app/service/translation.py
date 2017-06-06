@@ -5,7 +5,7 @@ from requests_futures.sessions import FuturesSession
 from rx import Observable
 
 from app.entity.translation import TitleTranslation
-
+import config
 
 __author__ = 'Flavio Ferrara'
 
@@ -62,9 +62,9 @@ class UnbabelTranslator:
 
 class UnbabelService:
     def __init__(self):
-        self.endpoint = 'https://sandbox.unbabel.com/tapi/v2/mt_translation'
+        self.endpoint = config.UNBABEL_ENDPOINT
         self.headers = {
-            'Authorization': 'ApiKey {}:{}'.format('femferrara', 'e5978389579797963998666d6a61aed758417543'),
+            'Authorization': 'ApiKey {}:{}'.format(config.UNBABEL_NAME, config.UNBABEL_KEY),
             'Content-Type': 'application/json'
         }
         self.session = FuturesSession()

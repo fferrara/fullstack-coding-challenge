@@ -1,23 +1,33 @@
-This is my solution for the Unbabel Fullstack Challenge.
+This is my solution for the Unbabel Fullstack Challenge. Enjoy :wink:
 
 # Installation
 
-Tested with Python 3.6
+*Tested with Python 3.6*
 
-Just clone the repository. 
+1. Install and run MongoDB
 
-The recommended way is to create a virtual environment. On Linux/Mac
+2. Clone or download the repository. 
 
-    virtualenv fferrara-challenge
-    cd fferrara-challenge
-    source bin/activate
-    pip install -r requirements.txt
+3. Check `config.py` to ajust configuration for your environment.
 
-To run the application:
+4. The recommended way is to create a virtual environment. On Linux/Mac
 
-    python -u run.py
+        virtualenv fferrara-challenge
+        cd fferrara-challenge
+        source bin/activate
+        pip install -r requirements.txt
+
+5. To run the application:
+
+        python -u run.py
 
 # Design choices
+
+The database credentials and Unbabel API credentials are stored in `config.py` file and under version control. 
+In an normal application, it is **very dangerous** to share security credentials. A better way would be to set
+environmental variables or have a config file outside VC.
+
+-----------------------
 
 The application is self-contained, so it doesn't need any system setup. 
 It uses a Python scheduler to schedule repeating tasks. 
@@ -39,6 +49,15 @@ It decouples the different components that communicate through streams.
 - Better memory management to ensure all the threads are cleaned up properly.
 - Using an ODM library.
 - Better error managements.
+
+## Run behavior scenarios
+
+    behave
+
+## Run unit tests
+
+    python -m unittest discover -s tests
+    
 
 # Unbabel Fullstack Challenge
 

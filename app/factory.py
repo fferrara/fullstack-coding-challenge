@@ -1,21 +1,19 @@
 from flask.helpers import url_for
 from app.pages import stories, dashboard
 from flask import Flask, redirect, g
+import config
 
 __author__ = 'Flavio Ferrara'
 
 
-def create_app(config=None):
+def create_app(custom_config=None):
     app = Flask('raquer_news')
 
     app.config.update(dict(
         DEBUG=True,
-        DATABASE='raquer_db',
-        SECRET_KEY='development key',
-        USERNAME='admin',
-        PASSWORD='default'
+        DATABASE=config.DATABASE
     ))
-    app.config.update(config or {})
+    app.config.update(custom_config or {})
 
     register_blueprints(app)
     register_teardowns(app)

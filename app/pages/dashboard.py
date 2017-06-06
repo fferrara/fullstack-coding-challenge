@@ -9,7 +9,7 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 @dashboard_bp.route('/')
 def index():
-    g.db, g.db_client = get_db(current_app)
+    g.db, g.db_client = get_db()
     repository = TranslationRepositoryMongo(g.db)
     translations = repository.find_all()
     return render_template('dashboard/index.html', translations=translations)

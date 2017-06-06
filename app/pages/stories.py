@@ -8,7 +8,7 @@ stories_bp = Blueprint('stories', __name__, url_prefix='/stories')
 
 @stories_bp.route('/')
 def index():
-    g.db, g.db_client = get_db(current_app)
+    g.db, g.db_client = get_db()
     repository = StoryRepositoryMongo(g.db)
     stories = repository.find_all()
 
