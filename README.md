@@ -28,6 +28,10 @@ environmental variables or have a config file outside VC.
 
 -----------------------
 
+The application downloads, translates and stores the top 10 Hackernews stories at each run. So, starting from the second run, the displayed list can contain more than 10 stories, if new stories entered the top 10 on Hackernews.
+
+---------------
+
 The application is self-contained, so it doesn't need any system setup. 
 It uses a Python scheduler to schedule repeating tasks. 
 In a production environment, it would be probably better to use a system scheduler like `cron`.
