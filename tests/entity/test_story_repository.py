@@ -32,6 +32,7 @@ class StoryRepositoryTest(unittest.TestCase):
         self.translation_data = {
             "status": "new",
             "target_language": "pt",
+            "text": "My YC app: Dropbox - Throw away your USB drive",
             "uid": "5d10df62d3"
         }
 
@@ -69,12 +70,12 @@ class StoryRepositoryTest(unittest.TestCase):
         # method call
         story = self.repository.find_one(8863)
         story.add_translation(translation)
-        self.repository.update(story)
+        self.repository.save(story)
 
         # testing
         updated_story = self.collection.find_one({"_id": 8863})
         assert updated_story is not None
-        print(updated_story)
+        assert len(updated_story['translations']) > 0
 
     def __insert_example_story(self):
         story = Story(**self.story_data)

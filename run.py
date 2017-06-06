@@ -12,17 +12,19 @@ from app.service.translation import UnbabelTranslator
 story_fetcher = StoryFetcher()
 translator = UnbabelTranslator()
 
-def translate(story, story_rep, translation_rep):
+def translate(story, story_rep):
     print('pushada story {}'.format(story.id))
 
-    story_rep.save(story)
-    translator.translate(story, 'pt').subscribe(translation_rep.save)
+    def add_translation(translation):
+        story.translations.append(translation)
+        story_rep.save(story)
+
+    translator.translate(story, 'pt').subscribe(add_translation)
     #translator.translate(story, 'it').subscribe(store_translation)
 
-def check_translations(story_rep, translation_rep):
+def check_translations(translation_rep):
     def save_translation(translation):
-        story_rep.update_translation(translation)
-        translation_rep.save(translation)
+        translation_rep.update(translation)
 
     pending = translation_rep.find_pending()
     translator.check_translations(pending).subscribe(save_translation)
@@ -34,12 +36,12 @@ if __name__ == '__main__':
     story_rep = StoryRepositoryMongo(db)
     translation_rep = TranslationRepositoryMongo(db)
 
-    new_stories, old_stories = story_fetcher.story_stream.partition(lambda story: story_rep.find_one(story.id) is None)
+    new_stories = story_fetcher.story_stream.filter(lambda story: story_rep.find_one(story.id) is None)
 
     # translating new stories
-    new_stories.subscribe(lambda story: translate(story, story_rep, translation_rep))
+    new_stories.subscribe(lambda story: translate(story, story_rep))
     # updating old stories
-    old_stories.subscribe(story_rep.save)
+    story_fetcher.story_stream.subscribe(story_rep.save)
 
     scheduler = schedule.NonBlockingScheduler()
     #scheduler.every(5).minutes.do(story_fetcher.fetch_stories)

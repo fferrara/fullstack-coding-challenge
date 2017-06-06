@@ -10,7 +10,7 @@ def create_app(config=None):
 
     app.config.update(dict(
         DEBUG=True,
-        DATABASE='test_db',
+        DATABASE='raquer_db',
         SECRET_KEY='development key',
         USERNAME='admin',
         PASSWORD='default'

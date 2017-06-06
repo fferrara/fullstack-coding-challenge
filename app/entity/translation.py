@@ -1,13 +1,18 @@
 __author__ = 'Flavio Ferrara'
 
 
+class TranslationStatus():
+    PENDING = 'new'
+    COMPLETED = 'completed'
+
+
 class TitleTranslation:
     def __init__(self,
                  uid,
                  text,
+                 status,
+                 target_language,
                  translated_text=None,
-                 target_language="",
-                 status=None,
                  text_format='text',
                  **kwargs):
         self.uid = uid
@@ -18,4 +23,11 @@ class TitleTranslation:
         self.text_format = text_format
 
     def is_completed(self):
-        return self.status == "completed"
+        return self.status == TranslationStatus.COMPLETED
+
+    def to_document(self):
+        return self.__dict__.copy()
+
+    def complete_translation(self, text):
+        self.translated_text = text
+        self.status = TranslationStatus.COMPLETED

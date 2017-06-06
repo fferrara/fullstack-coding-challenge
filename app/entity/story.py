@@ -18,12 +18,13 @@ class Story(HackernewsItem):
         return self.original_title
 
     def add_translation(self, translation):
-        pass
+        self.translations.append(translation)
 
     def to_document(self):
         doc = self.__dict__.copy()
         doc['comments'] = [c.to_document() for c in self.comments]
         doc['translations'] = [t.to_document() for t in self.translations]
+        doc['_id'] = self.id
 
         return doc
 
