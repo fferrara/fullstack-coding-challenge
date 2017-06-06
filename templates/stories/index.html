@@ -2,36 +2,48 @@
 {% block content %}
     {% if stories | length  == 0 %}
         <p>No entries here so far :/</p>
-    {% endif %}
-    <ol class="list-group">
-        {% for story in stories %}
-            <li class="story list-group-item">
-                <h4><a href="{{ story.url }}">{{ story.get_title('pt') }}</a></h4>
+    {% else %}
+        <h3>
+            {% if language == 'it' %}
+                Le migliori storie di Hackernews per te, tradotte da <a href="https://unbabel.com">Unbabel</a>!
+            {% else %}
+                As melhores histórias de Hackernews para você, traduzidas por <a href="https://unbabel.com">Unbabel</a>!
+            {% endif %}
+        </h3>
+        <ol class="list-group">
+            {% for story in stories %}
+                <li class="story list-group-item">
+                    <h4><a href="{{ story.url }}">{{ story.get_title(language) }}</a></h4>
+                    {% if not story.translations %}
+                    <p>translating...</p>
+                    {% endif %}
 
-                <p>
-                    {{ story.score }} points by <span class="text-muted">{{ story.by }}</span>.
-                    <a role="button" data-toggle="collapse" href="#commentList{{ loop.index }}" aria-expanded="false"
-                       aria-controls="commentList{{ loop.index }}">
-                        {{ story.comments | length }} comments
-                    </a>
-                </p>
+                    <p>
+                        {{ story.score }} points by <span class="text-muted">{{ story.by }}</span>.
+                        <a role="button" data-toggle="collapse" href="#commentList{{ loop.index }}"
+                           aria-expanded="false"
+                           aria-controls="commentList{{ loop.index }}">
+                            {{ story.descendants }} comments
+                        </a>
+                    </p>
 
-                <div class="collapse" id="commentList{{ loop.index }}">
-                    <div class="well">
-                        {% for comment in story.comments recursive %}
-                            <div class="comment">
-                                <span class="text-muted">{{ comment.by }}</span>
+                    <div class="collapse" id="commentList{{ loop.index }}">
+                        <div class="well">
+                            {% for comment in story.comments recursive %}
+                                <div class="comment">
+                                    <span class="text-muted">{{ comment.by }}</span>
 
-                                <div class="comment-body">{{ comment.text | safe }}</div>
-                                {%- if comment.comments -%}
-                                    <ul class="subcomment">{{ loop(comment.comments) }}</ul>
-                                {%- endif %}
-                            </div>
-                        {% endfor %}
+                                    <div class="comment-body">{{ comment.text | safe }}</div>
+                                    {%- if comment.comments -%}
+                                        <ul class="subcomment">{{ loop(comment.comments) }}</ul>
+                                    {%- endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-            </li>
-        {% endfor %}
-    </ol>
+                </li>
+            {% endfor %}
+        </ol>
 
+    {% endif %}
 {% endblock %}

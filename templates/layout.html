@@ -4,36 +4,45 @@
     <meta charset="UTF-8">
     <title>Raquer News</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet"  href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
 </head>
 <body>
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="/stories">
-                            {% if language == 'it' %}
-                                Migliori storie
-                              {% else %}
-                                Melhoras histórias
-                              {% endif %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/dashboard">Dashboard</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar navbar-default">
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        <div class="navbar-header">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Raquernews
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/stories?lang=it">
+                                <span class="lang-name">Migliori storie</span>
+                                <img class="lang-icon" src="{{ url_for('static', filename='img/it.png') }}"/>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/stories?lang=pt">
+                                <span class="lang-name">Melhores histórias</span>
+                                <img class="lang-icon" src="{{ url_for('static', filename='img/pt.png') }}"/>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+            </ul>
+        </div>
     </div>
+</nav>
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
 
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}" ></script>
+<script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
 
 </html>

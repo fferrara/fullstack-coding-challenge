@@ -1,7 +1,3 @@
-import threading
-import time
-from app.entity.comment import Comment
-from app.entity.story import Story
 import app.scheduler as schedule
 from app.db import get_db
 from app.entity.repository import TranslationRepositoryMongo, StoryRepositoryMongo
@@ -9,15 +5,23 @@ from app.factory import create_app
 from app.service.story_source import StoryFetcher
 from app.service.translation import UnbabelTranslator
 
-def translate(story):
-    print('pushada story {}'.format(story.id))
+import logging
 
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+
+def translate(story):
     def add_translation(translation):
         story.translations.append(translation)
         story_rep.save(story)
 
     translator.translate(story, 'pt').subscribe(add_translation)
-    #translator.translate(story, 'it').subscribe(store_translation)
+    translator.translate(story, 'it').subscribe(add_translation)
 
 
 def check_translations():

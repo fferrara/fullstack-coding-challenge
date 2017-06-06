@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, g, current_app
+from flask import Blueprint, render_template, g, current_app, request
 from app.db import get_db
 from app.entity.repository import StoryRepositoryMongo
 
@@ -11,4 +11,6 @@ def index():
     g.db, g.db_client = get_db(current_app)
     repository = StoryRepositoryMongo(g.db)
     stories = repository.find_all()
-    return render_template('stories/index.html', stories=stories)
+
+    language = request.args.get('lang', 'pt')
+    return render_template('stories/index.html', stories=stories, language=language)

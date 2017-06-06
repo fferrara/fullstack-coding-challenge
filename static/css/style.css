@@ -1,13 +1,21 @@
-ol { list-style: decimal inside; }
+.lang-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.lang-name {
+    display: inline-block;
+    min-width: 80%;
+}
 
 .comment-body {
     padding-left: 10px;
 }
 
-.translation-new {
+.translation-machine_translate_in_progress {
     color: #f4a744;
 }
 
-.translation-complete {
+.translation-deliver_ok {
     color: green;
 }

@@ -1,21 +1,19 @@
-from functools import partial
 import json
-import threading
-import time
+import logging
+
 from requests_futures.sessions import FuturesSession
 from rx import Observable
-from app.entity.repository import TranslationRepositoryMongo
+
 from app.entity.translation import TitleTranslation
 
-__author__ = 'Flavio Ferrara'
 
-from rx.subjects import Subject
+__author__ = 'Flavio Ferrara'
 
 
 def build_translation(response, error):
     if response.status_code > 299:
         raise ValueError('Translation request failed: {}'.format(response.content))
-    print(response)
+
     data = response.json()
     return TitleTranslation(**data)
 
@@ -38,7 +36,6 @@ class UnbabelTranslator:
         :param story:
         :param language:
         """
-        print('Translating')
 
         return self.unbabel.translate(story.original_title, language).map(build_translation)
 
@@ -50,15 +47,17 @@ class UnbabelTranslator:
         :param pending: a list of pending TitleTranslations.
         :return: an Observable where completed TitleTranslations will be emitted
         """
-        all_completed = []
-        for pending_translation in pending:
-            completed = self.unbabel.get_translation(pending_translation.uid) \
-                .map(build_translation) \
-                .filter(lambda translation: translation.is_completed)
-            all_completed.append(completed)
+        logging.info('Checking pending translations from Unbabel...')
 
-        print(all_completed)
+        all_completed = [self.__get_completed_translation(translation.uid)
+                         for translation in pending]
+
         return Observable.merge(all_completed)
+
+    def __get_completed_translation(self, uid):
+        return self.unbabel.get_translation(uid)\
+            .map(build_translation)\
+            .filter(lambda translation: translation.is_completed)
 
 
 class UnbabelService:
@@ -77,7 +76,6 @@ class UnbabelService:
         :param str language:
         :return:
         """
-        print(text)
         payload = {
             "text": text,
             "source_language": "en",

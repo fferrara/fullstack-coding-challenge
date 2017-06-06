@@ -19,19 +19,26 @@ To run the application:
 
 # Design choices
 
-The application is self-contained, so it doesn't need any system setup. It uses a Python scheduler to schedule repeating tasks. In a production environment, it would be probably better to use a system scheduler like `cron`.
+The application is self-contained, so it doesn't need any system setup. 
+It uses a Python scheduler to schedule repeating tasks. 
+In a production environment, it would be probably better to use a system scheduler like `cron`.
 
-For the same reason, pending Unbabel translations are checked using a polling approach: a GET call each minute until the translated text is available. In production, it is recommended to provide a POST endpoint, reachable from the Internet, and use the `callback_url` parameter to pass the URL to Unbabel.
+For the same reason, pending Unbabel translations are checked using a polling approach: 
+a GET call each minute until the translated text is available. 
+In production, it is recommended to provide a POST endpoint, reachable from the Internet, and use the `callback_url` parameter to pass the URL to Unbabel.
 
 -------
 
-All network API calls are non-blocking, to improve scalability. Moreover, the Unbabel translation process is asynchronous. To handle all the asynchronicity I adopted a reactive programming approach using [RxPy](https://github.com/ReactiveX/RxPY). It allows different async operations to have low coupling.
+To improve scalability, all network API calls are non-blocking. The Unbabel translation process is asynchronous as well. 
+To handle all the asynchronicity and maintain low coupling between components, I adopted a reactive programming approach using [RxPy](https://github.com/ReactiveX/RxPY). 
+It decouples the different components that communicate through streams.
 
 ## Possible improvements
 
-- Using an ODM library.
 - Improve tests coverage. Testing asynchronous code can be quite difficult.
-
+- Better memory management to ensure all the threads are cleaned up properly.
+- Using an ODM library.
+- Better error managements.
 
 # Unbabel Fullstack Challenge
 

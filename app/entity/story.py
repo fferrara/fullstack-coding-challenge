@@ -4,6 +4,7 @@ from app.entity.translation import TitleTranslation
 
 __author__ = 'Flavio Ferrara'
 
+
 class Story(HackernewsItem):
     def __init__(self, id, by, time, url, score, title, descendants, text='', kids=None, **kwargs):
         super().__init__(id, by, time, text, kids)
@@ -20,10 +21,9 @@ class Story(HackernewsItem):
 
         try:
             translation = next(t for t in self.translations if t.target_language == language and t.is_completed())
-            print(translation)
             return translation.translatedText
         except StopIteration:
-            raise ValueError('No completed translation for language {}'.format(language))
+            return self.original_title
 
     def add_translation(self, translation):
         self.translations.append(translation)

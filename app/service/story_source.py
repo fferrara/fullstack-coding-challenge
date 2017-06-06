@@ -1,4 +1,6 @@
+import logging
 from requests import session
+from requests.adapters import HTTPAdapter
 from requests_futures.sessions import FuturesSession
 from rx import Observable
 
@@ -19,14 +21,14 @@ class StoryFetcher:
     def __init__(self):
         self.__subject = Subject()
         self.hn = HackernewsService()
-        self.limit = 3
+        self.limit = 10
 
     @property
     def story_stream(self):
         return self.__subject.as_observable()
 
     def fetch_stories(self, limit=None):
-        print('Fetching stories from hacker news...')
+        logging.info('Fetching stories from hacker news...')
         if limit is not None:
             self.limit = limit
 
@@ -69,11 +71,10 @@ class StoryFetcher:
 class HackernewsService:
     def __init__(self):
         self.endpoint = 'https://hacker-news.firebaseio.com/v0/'
-        self.session = session()
+        self.session = FuturesSession(max_workers=50)
 
     def get_all_stories_obs(self):
-        session = FuturesSession(session=self.session)
-        future = session.get('{}{}'.format(self.endpoint, 'topstories.json'))
+        future = self.session.get('{}{}'.format(self.endpoint, 'topstories.json'))
         return Observable.from_future(future)
 
     def get_item_obs(self, item_id):
@@ -81,7 +82,6 @@ class HackernewsService:
         return Observable.from_future(future)
 
     def get_item(self, item_id):
-        session = FuturesSession(session=self.session)
-        return session.get('{}{}{}{}'.format(self.endpoint, 'item/', str(item_id), '.json'))
+        return self.session.get('{}{}{}{}'.format(self.endpoint, 'item/', str(item_id), '.json'))
 
 
