@@ -22,14 +22,14 @@ class UnbabelServiceTest(unittest.TestCase):
     #     assert data['text'] == 'Welcome!'
     #     assert data['target_language'] == 'it'
     #     assert data['source_language'] == 'en'
-
-    def testGetTranslation(self):
-        future = self.unbabel.get_translation('e578c3349f')
-        assert future is not None
-
-        result = future.result()
-        print(result.status_code)
-        assert result.status_code == 200
-
-        data = result.json()
-        assert data is not None
+    #
+    # def testGetTranslation(self):
+    #     future = self.unbabel.get_translation('e578c3349f')
+    #     assert future is not None
+    #
+    #     result = future.result()
+    #     print(result.status_code)
+    #     assert result.status_code == 200
+    #
+    #     data = result.json()
+    #     assert data is not None

@@ -10,16 +10,16 @@ Feature: Raquernews shows Hackernews posts
      Then no post is displayed
 
   Scenario: 10 news are displayed
-    Given the news list contain at least 10 news
+    Given the news list contains some news
      When user visit the homepage
-     Then 10 news are displayed
+     Then the news are displayed
 
   Scenario: news titles are translated to italian
-    Given the news list contain at least 10 news
+    Given the news list contains some news
      When user visit the homepage in italian
      Then the news titles are in italian
 
   Scenario: news titles are translated to brazilian portuguese
-    Given the news list contain at least 10 news
-     When user visit the homepage in pt-br
-     Then the news titles are in pt-br
+    Given the news list contains some news
+     When user visit the homepage in pt
+     Then the news titles are in pt

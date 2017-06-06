@@ -15,11 +15,11 @@ Feature: User checks state of translations
      Then the translation jobs are displayed
 
   Scenario: Unfinished translation job
-    Given the translation list contain some unfinished job
+    Given the translation list is not empty
      When user visit the dashboard
      Then the unfinished translations are marked in yellow
 
   Scenario: Finished translation job
-    Given the translation list contain some finished job
+    Given the translation list is not empty
      When user visit the dashboard
      Then the finished translations are marked in green

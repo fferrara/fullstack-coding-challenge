@@ -30,10 +30,10 @@ class TranslationRepositoryTest(unittest.TestCase):
             "url": "http://www.getdropbox.com/u/2/screencast.html",
         })
 
-        self.t1 = TitleTranslation("5d10df62d3", "My YC app: Dropbox - Throw away your USB drive", "machine_translation_in_progress", "pt")
+        self.t1 = TitleTranslation("5d10df62d3", "My YC app: Dropbox - Throw away your USB drive", "machine_translate_in_progress", "pt")
 
         self.t2 = TitleTranslation("5d10df62d4", "My YC app: Dropbox - Throw away your USB drive", "deliver_ok", "it",
-                                   translated_text='Butta via il tuo USB drive')
+                                   translatedText='Butta via il tuo USB drive')
 
         self.__insert_example_story()
 
@@ -47,6 +47,15 @@ class TranslationRepositoryTest(unittest.TestCase):
         assert not translations[0].is_completed()
         assert translations[1].is_completed()
 
+    def test_find_pending(self):
+        translations = self.repository.find_pending()
+
+        assert translations is not None
+        assert isinstance(translations, list)
+        assert len(translations) == 1
+
+        assert not translations[0].is_completed()
+
     def test_save_translation(self):
         self.t1.complete_translation('Jogue fora seu USB drive')
         self.repository.save(self.t1)
@@ -56,16 +65,7 @@ class TranslationRepositoryTest(unittest.TestCase):
         assert len(updated_story['translations']) > 0
         translation = updated_story['translations'][0]
         assert translation['status'] == 'deliver_ok'
-        assert translation['translated_text'] == 'Jogue fora seu USB drive'
-
-    def test_find_pending(self):
-        translations = self.repository.find_pending()
-
-        assert translations is not None
-        assert isinstance(translations, list)
-        assert len(translations) == 1
-
-        assert not translations[0].is_completed()
+        assert translation['translatedText'] == 'Jogue fora seu USB drive'
 
 
     def __insert_example_story(self):
